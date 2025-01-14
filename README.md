@@ -102,7 +102,7 @@ Here is the basic structure with stub or empty files in place.
 │   ├── homepage.css
 │   └── site.css
 ├── img
-│   └── cute-grey-kitten.jpg
+│   └── MyPicture.jpeg
 ├── js
 │   └── site.js
 ├── experiment1

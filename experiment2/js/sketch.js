@@ -1,6 +1,6 @@
 // sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+// Author: Samina Esteqlal
+// Date: January 20, 2025
 
 // Here is how you might set up an OOP p5.js project
 // Note that p5.js looks for a file called sketch.js
@@ -9,6 +9,13 @@
 // In a longer project I like to put these in a separate file
 const VALUE1 = 1;
 const VALUE2 = 2;
+
+'use strict';
+
+var tileCount = 50;
+var actRandomSeed = 0;
+
+var rectSize = 14;
 
 // Globals
 let myInstance;
@@ -49,29 +56,52 @@ function setup() {
     resizeScreen();
   });
   resizeScreen();
+
+  colorMode(HSB, 460, 50, 50, 100);
+  noStroke();
+  fill(200, 300, 64, 60);
 }
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  background(220);    
-  // call a method on the instance
-  myInstance.myMethod();
+  clear();
 
-  // Set up rotation for the rectangle
-  push(); // Save the current drawing context
-  translate(centerHorz, centerVert); // Move the origin to the rectangle's center
-  rotate(frameCount / 100.0); // Rotate by frameCount to animate the rotation
-  fill(234, 31, 81);
-  noStroke();
-  rect(-125, -125, 250, 250); // Draw the rectangle centered on the new origin
-  pop(); // Restore the original drawing context
+  randomSeed(actRandomSeed);
 
-  // The text is not affected by the translate and rotate
-  fill(255);
-  textStyle(BOLD);
-  textSize(140);
-  text("p5*", centerHorz - 105, centerVert + 40);
+  for (var gridY = 0; gridY < tileCount; gridY++) {
+    for (var gridX = 0; gridX < tileCount; gridX++) {
+
+      var posX = width / tileCount * gridX;
+      var posY = height / tileCount * gridY;
+
+      var shiftX1 = mouseX / 100 * random(-10, 10);
+      var shiftY1 = mouseY / 100 * random(-10, 10);
+      var shiftX2 = mouseX / 100 * random(-10, 10);
+      var shiftY2 = mouseY / 100 * random(-10, 10);
+      var shiftX3 = mouseX / 100 * random(-10, 10);
+      var shiftY3 = mouseY / 100 * random(-10, 10);
+      var shiftX4 = mouseX / 100 * random(-10, 10);
+      var shiftY4 = mouseY / 100 * random(-10, 10);
+
+      // Randomize color for each rectangle
+      let h = random(360); // Random hue (for HSB mode)
+      let s = random(50);  // Random saturation
+      let b = random(50);  // Random brightness
+      fill(h, s, b, 60);    // Apply random fill color
+
+      push();
+      translate(posX, posY);
+      beginShape();
+      vertex(shiftX1, shiftY1);
+      vertex(rectSize + shiftX2, shiftY2);
+      vertex(rectSize + shiftX3, rectSize + shiftY3);
+      vertex(shiftX4, rectSize + shiftY4);
+      endShape();
+      pop();
+    }
+  }
 }
+
 
 // mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {

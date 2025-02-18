@@ -7,6 +7,8 @@
 
 // Constants - User-servicable parts
 // In a longer project I like to put these in a separate file
+'use strict';
+
 const VALUE1 = 1;
 const VALUE2 = 2;
 
@@ -26,54 +28,125 @@ class MyClass {
     }
 }
 
+var x = 0;
+var y = 0;
+var stepSize = 100.0; // Slower print by reducing step size
+
+var gothicFonts = ['Blackletter', 'Old English Text MT', 'Uncial Antiqua', 'Fraktur', 'Cinzel Decorative'];
+var fontSizeMin = 12;
+var angleDistortion = 0.0;
+
+var haiku = [];
+var haikuLines = [
+  ['love between us is', 'speech and breath. loving you is', 'a long river running.']
+];
+var haikuTitle = "Haiku [for you] by Sonia Sanchez";
+var counter = 0;
+var colors = ['rgb(230, 204, 178)', 'rgb(180, 140, 120)', 'rgb(150, 120, 110)', 'rgb(210, 180, 160)', 'rgb(200, 170, 150)']; // Dark, muted gothic tones
+
 function resizeScreen() {
-  centerHorz = canvasContainer.width() / 2; // Adjusted for drawing logic
-  centerVert = canvasContainer.height() / 2; // Adjusted for drawing logic
+  centerHorz = canvasContainer.width() / 2;
+  centerVert = canvasContainer.height() / 2;
   console.log("Resizing...");
   resizeCanvas(canvasContainer.width(), canvasContainer.height());
-  // redrawCanvas(); // Redraw everything based on new size
 }
 
-// setup() function is called once when the program starts
 function setup() {
-  // place our canvas, making it fit our container
   canvasContainer = $("#canvas-container");
   let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
   canvas.parent("canvas-container");
-  // resize canvas is the page is resized
-
-  // create an instance of the class
+  
   myInstance = new MyClass("VALUE1", "VALUE2");
-
+  
   $(window).resize(function() {
     resizeScreen();
   });
   resizeScreen();
+  
+  background('rgb(65,14,14)');
+  cursor(CROSS);
+  
+  x = mouseX;
+  y = mouseY;
+  
+  textAlign(CENTER);
+  fill(255);
+  displayTitle();
+  generateHaiku();
 }
 
-// draw() function is called repeatedly, it's the main animation loop
 function draw() {
-  background(220);    
-  // call a method on the instance
   myInstance.myMethod();
 
-  // Set up rotation for the rectangle
-  push(); // Save the current drawing context
-  translate(centerHorz, centerVert); // Move the origin to the rectangle's center
-  rotate(frameCount / 100.0); // Rotate by frameCount to animate the rotation
-  fill(234, 31, 81);
-  noStroke();
-  rect(-125, -125, 250, 250); // Draw the rectangle centered on the new origin
-  pop(); // Restore the original drawing context
+  // Add dried tear stain effect
+  for (let i = 0; i < 5; i++) {
+    let stainX = random(width);
+    let stainY = random(height);
+    let stainSize = random(5, 20);
+    let opacity = random(50, 100);
+    
+    noStroke();
+    fill(100, 50, 50, opacity); // Muted, uneven stains
+    ellipse(stainX, stainY, stainSize, stainSize * random(1, 2));
+    
+    for (let j = 0; j < random(3, 6); j++) {
+      let dripX = stainX + random(-5, 5);
+      let dripY = stainY + j * random(3, 8);
+      let dripSize = stainSize * random(0.2, 0.5);
+      fill(80, 40, 40, opacity * 0.8);
+      ellipse(dripX, dripY, dripSize, dripSize * 1.5);
+    }
+  }
 
-  // The text is not affected by the translate and rotate
-  fill(255);
-  textStyle(BOLD);
-  textSize(140);
-  text("p5*", centerHorz - 105, centerVert + 40);
+  if (mouseIsPressed && mouseButton == LEFT) {
+    var d = dist(x, y, mouseX, mouseY);
+    var newLine = haiku[counter % haiku.length].split(" ");
+    textFont(random(gothicFonts));
+    fill(colors[counter % colors.length]);
+
+    push();
+    translate(x, y);
+    rotate(random(-PI / 8, PI / 8)); // Random rotation
+    for (let i = 0; i < newLine.length; i++) {
+      textSize(random(12, 40)); // Random font sizes for words
+      text(newLine[i], i * random(20, 50), random(-10, 10));
+    }
+    pop();
+
+    counter++;
+    x = x + cos(angleDistortion) * stepSize;
+    y = y + sin(angleDistortion) * stepSize;
+  }
 }
 
-// mousePressed() function is called once after every time a mouse button is pressed
 function mousePressed() {
-    // code to run when mouse is pressed
+  x = mouseX;
+  y = mouseY;
+}
+
+function keyReleased() {
+  if (key == 's' || key == 'S') saveCanvas('haiku_art', 'png');
+  if (keyCode == DELETE || keyCode == BACKSPACE) {
+    background('rgb(65,14,14)');
+    displayTitle();
+    generateHaiku();
+    counter = 0;
+  }
+}
+
+function keyPressed() {
+  if (keyCode == UP_ARROW) angleDistortion += 0.1;
+  if (keyCode == DOWN_ARROW) angleDistortion -= 0.1;
+}
+
+function generateHaiku() {
+  haiku = haikuLines[0];
+}
+
+function displayTitle() {
+  textSize(32);
+  textFont('Cinzel Decorative');
+  let goldGradient = lerpColor(color(255, 215, 0), color(200, 180, 50), sin(frameCount * 0.05));
+  fill(goldGradient);
+  text(haikuTitle, width / 2, height / 4);
 }

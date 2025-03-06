@@ -64,7 +64,7 @@ function setup() {
   });
   resizeScreen();
 
-  colors = [color(65, 105, 185), color(245, 95, 80), color(15, 233, 118)];
+  colors = [color(65, 105, 185), color(245, 95, 80), color(15, 233, 118)]; // Default colors
   pixelDensity(1);
 
   setupText();
@@ -82,12 +82,40 @@ function setupSpeech() {
     speechRec.onresult = (event) => {
       const transcript = event.results[event.results.length - 1][0].transcript;
       textTyped = transcript.toUpperCase(); // Update the text
+      const sentiment = analyzeText(textTyped.toLowerCase()); // Analyze sentiment
+      updateColors(sentiment); // Update colors based on sentiment
       console.log("You said:", textTyped); // Log the recognized text
       setupText(); // Update the visualization
     };
     speechRec.start();
   } else {
     console.error("Web Speech API is not supported in this browser.");
+  }
+}
+
+function analyzeText(text) {
+  // Example: Simple sentiment analysis
+  const positiveWords = ["happy", "joy", "love", "excited", "good", "great"];
+  const negativeWords = ["sad", "angry", "hate", "fear", "bad", "terrible"];
+
+  let sentiment = "neutral";
+  for (let word of positiveWords) {
+    if (text.includes(word)) sentiment = "positive";
+  }
+  for (let word of negativeWords) {
+    if (text.includes(word)) sentiment = "negative";
+  }
+
+  return sentiment;
+}
+
+function updateColors(sentiment) {
+  if (sentiment === "positive") {
+    colors = [color(255, 200, 0), color(0, 200, 255), color(100, 255, 100)]; // Bright, cheerful colors
+  } else if (sentiment === "negative") {
+    colors = [color(255, 0, 0), color(100, 0, 0), color(50, 50, 50)]; // Dark, intense colors
+  } else {
+    colors = [color(65, 105, 185), color(245, 95, 80), color(15, 233, 118)]; // Default colors
   }
 }
 
